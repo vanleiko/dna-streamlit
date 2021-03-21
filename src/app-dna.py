@@ -4,8 +4,10 @@ import seaborn as sns
 import streamlit as st
 from PIL import Image
 
+
 imagem = Image.open("dna-logo.jpg")
 st.image(imagem, use_column_width=True)
+
 
 def formata_sequencia(sequencia): 
     sequencia = sequencia.upper()
