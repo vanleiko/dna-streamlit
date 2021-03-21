@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# venv
+venv_dna
+
+# vscode
+.vscode/
