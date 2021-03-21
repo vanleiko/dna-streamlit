@@ -9,6 +9,7 @@ imagem = Image.open("dna-logo.jpg")
 st.image(imagem, use_column_width=True)
 
 
+@st.cache
 def formata_sequencia(sequencia): 
     sequencia = sequencia.upper()
 
