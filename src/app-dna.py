@@ -1,12 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from collections import Counter
 import streamlit as st
 from PIL import Image
-
-
-imagem = Image.open("dna-logo.jpg")
-st.image(imagem, use_column_width=True)
 
 
 @st.cache
@@ -32,20 +29,25 @@ def eh_dna(sequencia):
         return False
 
 
-def conta_nucleotideos(sequencia, selecao):    
+def calcula_porcentagem(nucleotideo, total):
+    porcentagem = (nucleotideo / total) * 100
+    
+    return porcentagem
+
+
+def conta_nucleotideos(sequencia, selecao="Quantidade"): 
+    conta = Counter(sequencia) 
+    total = len(sequencia)
  
-    total = len(sequencia)
-
-    adenina = sequencia.count("A")
-    citosina = sequencia.count("C")
-    guanina = sequencia.count("G")
-    timina = sequencia.count("T")
-    total = len(sequencia)
-
-    porc_adenina = (adenina / total) * 100
-    porc_citosina = (citosina / total) * 100
-    porc_guanina = (guanina / total) * 100
-    porc_timina = (timina / total) * 100
+    adenina = conta["A"]
+    citosina = conta["C"]
+    guanina = conta["G"]
+    timina = conta["T"] 
+ 
+    porc_adenina = calcula_porcentagem(adenina, total)
+    porc_citosina = calcula_porcentagem(citosina, total)
+    porc_guanina = calcula_porcentagem(guanina, total)
+    porc_timina = calcula_porcentagem(timina, total)
     porc_total = porc_adenina + porc_citosina + porc_guanina + porc_timina
 
     df = pd.DataFrame({"Quantidade": [adenina, citosina, guanina, timina, total],
@@ -63,9 +65,11 @@ def conta_nucleotideos(sequencia, selecao):
 
 
 def conteudo_gc(sequencia):
+    conta = Counter(sequencia) 
+    total = len(sequencia)
+    gc = conta["G"] + conta["C"]
     
-    gc = sequencia.count("G") + sequencia.count("C")
-    porc_gc = (gc / len(sequencia)) * 100
+    porc_gc = calcula_porcentagem(gc, total)
     porc_at = 100 - porc_gc
      
     df = pd.DataFrame({"Porcentagem (%)": [porc_gc, porc_at]},
@@ -81,13 +85,21 @@ def conteudo_gc(sequencia):
 
 
 def main():
-    
-    st.title("# Contando nucleotídeos no DNA")
-    st.markdown("Web App que conta a quantidade e porcentagem de **A C G T** e o **Conteúdo GC** de uma sequência de **DNA**.")
 
-    st.subheader("**Insira a sua sequência de DNA**")
-    help_texto = "Insira uma sequência de nucleotídeos ou uma sequência no formato FASTA"
-    sequencia = st.text_area(label="Insira abaixo a sua sequência e pressione Ctrl + ENTER", height=250, help=help_texto)
+    imagem = Image.open("dna-logo.jpg")
+    default_input = open("sars_cov_2.fasta", "r").read()
+    help_text = "Insira uma sequência de nucleotídeos ou uma sequência no formato FASTA"
+
+    st.image(imagem, use_column_width=True)
+
+    st.title("Contando nucleotídeos no DNA")
+    st.markdown("""
+    Web App que conta a quantidade e porcentagem de **A C G T** e o **Conteúdo GC** de uma sequência de **DNA**.
+    """)
+
+    st.subheader("**Insira a sua sequência de DNA**")       
+    sequencia = st.text_area(label="Insira abaixo a sua sequência e pressione Ctrl + ENTER", 
+                            value=default_input, height=250, help=help_text)
 
     if sequencia:
         sequencia_formatada = formata_sequencia(sequencia)
