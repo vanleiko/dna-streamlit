@@ -227,17 +227,18 @@ def main():
     st.title("Alinhamento global de sequências de DNA")
     st.markdown("""<p style='text-align: justify'>
     WebApp que faz o alinhamento global de sequências de DNA, par a par, usando o algoritmo de 
-    <b>Needleman-Wunsch</b>, um dos algoritmos mais utilizados para o alinhamento de sequências biológicas. 
-    Para o alinhamento, foi considerado apenas os <b>matches</b> entre as bases das sequências. 
+    <b>Needleman-Wunsch</b>, um dos algoritmos mais utilizados para alinhamento de sequências biológicas. 
+    Foi considerado apenas os <b>matches</b> entre as bases das sequências, com pontuação +1, 
+    enquanto os <b>indels</b> foram pontuação com zero. 
     Esse WebApp também analisa a quantidade e a porcentagem de <b>A C G T</b> e o <b>Conteúdo GC</b> 
     de cada sequência.
     </p>""", unsafe_allow_html=True)
 
-    st.subheader("**Insira as suas sequências de DNA:**")       
-    seq1 = st.text_area(label="Insira abaixo a primeira sequência e pressione Ctrl + ENTER", 
+    st.subheader("**Insira abaixo as suas sequências de DNA:**")       
+    seq1 = st.text_area(label="Insira a Sequência 1 e pressione Ctrl + ENTER", 
                         value=default_input1, height=200, help=help_text)
 
-    seq2 = st.text_area(label="Insira abaixo a segunda sequência e pressione Ctrl + ENTER", 
+    seq2 = st.text_area(label="Insira a Sequência 2 e pressione Ctrl + ENTER", 
                         value=default_input2, height=200, help=help_text)
 
     if seq1 and seq2:
@@ -262,7 +263,7 @@ def main():
             st.write("(1)", ali_seq1)
             st.write("(2)", ali_seq2)
          
-            st.subheader("**# 2. Análise dos nucleotídeos:**")
+            st.subheader("**# 2. Análise das bases:**")
             selecao = st.selectbox("Selecione o gráfico:", ["Quantidade", "Porcentagem"])
      
             if selecao == "Quantidade":
@@ -283,7 +284,7 @@ def main():
 
         else:
             st.write("*As sequências inseridas não são DNA =(*")
-            st.write("*Insira nvamente suas sequências*")        
+            st.write("*Insira novamente suas sequências*")        
 
 
 if __name__ == "__main__":
