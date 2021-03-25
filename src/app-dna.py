@@ -228,8 +228,8 @@ def main():
     st.markdown("""<p style='text-align: justify'>
     WebApp que faz o alinhamento global de sequências de DNA, par a par, usando o algoritmo de 
     <b>Needleman-Wunsch</b>, um dos algoritmos mais utilizados para alinhamento de sequências biológicas. 
-    Foi considerado apenas os <b>matches</b> entre as bases das sequências, com pontuação +1, 
-    enquanto os <b>indels</b> foram pontuação com zero. 
+    Foi considerado apenas <b>match</b> entre as bases das sequências, com pontuação +1, enquanto 
+    <b>indel</b> foi pontuação zero. Mismatch não foi considerado. 
     Esse WebApp também analisa a quantidade e a porcentagem de <b>A C G T</b> e o <b>Conteúdo GC</b> 
     de cada sequência.
     </p>""", unsafe_allow_html=True)
