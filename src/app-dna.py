@@ -5,7 +5,8 @@ import seaborn as sns
 from collections import Counter
 import streamlit as st
 from PIL import Image
-
+import urllib.request
+import io
 
 @st.cache
 def formata_sequencia(sequencia): 
@@ -213,7 +214,11 @@ def gera_alinhamento(seq1, seq2, pontuacao, caminho):
 
 def main():
 
-    imagem = Image.open("dna-logo.jpg")
+    url = "https://raw.githubusercontent.com/vanleiko/dna-streamlit/main/src/dna-logo.jpg"
+    with urllib.request.urlopen(url) as i:
+	    byteImg = io.BytesIO(i.read())
+	    imagem = Image.open(byteImg)
+
     default_input1 = "ATCAACGGGATCGTAAAGCAAGATTCCGACTATCGTAGCTAGCTTGGAAAA"
     default_input2 = "ATCAATCGATCGTAAAGCAGATTCCGACTAAAGTAGCTAGCTTGTAAAT"
     help_text = "Insira uma sequência de nucleotídeos ou uma sequência no formato FASTA"
