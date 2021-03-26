@@ -8,6 +8,7 @@ from PIL import Image
 import urllib.request
 import io
 
+
 @st.cache
 def formata_sequencia(sequencia): 
     sequencia = sequencia.upper()
@@ -26,6 +27,7 @@ def formata_sequencia(sequencia):
     return sequencia
 
 
+@st.cache
 def eh_dna(seq):
     if set(seq).issubset({"A", "C", "G", "T", "*"}):
         return True
@@ -252,11 +254,13 @@ def main():
             matches, ali_seq1, ali_seq2 = gera_alinhamento(seq1_formatada, seq2_formatada, matriz_pontuacao, matriz_caminho)
             
             df_quantidade = df_quantidade_nucleotideos(seq1_formatada, seq2_formatada)
-            df_porcentagem = df_porcentagem_nucleotideos(seq1_formatada, seq2_formatada) 
+            df_porcentagem = df_porcentagem_nucleotideos(seq1_formatada, seq2_formatada)
+
+            grafico_quantidade = gera_grafico(df_quantidade, "Quantidade") 
+            grafico_porcentagem = gera_grafico(df_porcentagem, "Porcentagem") 
             
             df_gc = conteudo_gc(seq1_formatada, seq2_formatada)
             grafico_gc = gera_grafico_gc(df_gc)
-
             
             st.subheader("**# 1. Alinhamento global:**")
             st.write("Total de matches:", matches)
@@ -267,16 +271,12 @@ def main():
             selecao = st.selectbox("Selecione o gráfico:", ["Quantidade", "Porcentagem"])
      
             if selecao == "Quantidade":
-                df  = df_quantidade_nucleotideos(seq1_formatada, seq2_formatada)
-                grafico = gera_grafico(df_quantidade, "Quantidade")
-                st.dataframe(df)
-                st.pyplot(grafico)
+                st.dataframe(df_quantidade)
+                st.pyplot(grafico_quantidade)
 
             elif selecao =="Porcentagem":
-                df = df_porcentagem_nucleotideos(seq1_formatada, seq2_formatada)
-                grafico = gera_grafico(df_porcentagem, "Porcentagem")
-                st.dataframe(df)
-                st.pyplot(grafico)
+                st.dataframe(df_porcentagem)
+                st.pyplot(grafico_porcentagem)
                   
             st.subheader("**# 3. Conteúdo GC:**")
             st.dataframe(df_gc)
