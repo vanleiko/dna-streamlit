@@ -235,10 +235,10 @@ def main():
     </p>""", unsafe_allow_html=True)
 
     st.subheader("**Insira abaixo as suas sequências de DNA:**")       
-    seq1 = st.text_area(label="Insira a Sequência 1 e pressione Ctrl + ENTER", 
+    seq1 = st.text_area(label="Insira aqui a Sequência 1", 
                         value=default_input1, height=200, help=help_text)
 
-    seq2 = st.text_area(label="Insira a Sequência 2 e pressione Ctrl + ENTER", 
+    seq2 = st.text_area(label="Insira aqui a Sequência 2", 
                         value=default_input2, height=200, help=help_text)
 
     if seq1 and seq2:
