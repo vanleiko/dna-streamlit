@@ -198,13 +198,13 @@ def gera_alinhamento(seq1, seq2, pontuacao, caminho):
             j -= 1
     
         elif caminho[i][j] == "-":
-            ali_seq1 = "-" + ali_seq1
+            ali_seq1 = " - " + ali_seq1
             ali_seq2 = seq2[j] + ali_seq2
             j -= 1
         
         else:
             ali_seq1 = seq1[i] + ali_seq1
-            ali_seq2 = "-" + ali_seq2
+            ali_seq2 = " - " + ali_seq2
             i -= 1
 
     matches = pontuacao[-1][-1]
@@ -219,8 +219,8 @@ def main():
 	    byteImg = io.BytesIO(i.read())
 	    imagem = Image.open(byteImg)
 
-    default_input1 = "ATCAACGGGATCGTAAAGCAAGATTCCGACTATCGTAGCTAGCTTGGAAAA"
-    default_input2 = "ATCAATCGATCGTAAAGCAGATTCCGACTAAAGTAGCTAGCTTGTAAAT"
+    default_input1 = """ATGGCAACGGGATCGTAAAGCAAGATTCCGACTATCGTAGCTAGCTTGGAAAA"""
+    default_input2 = """TCAATCGATCGTAAAGCAGATTCCGACTAAAGTAGCTAGCTTGTAAAT"""
     help_text = "Insira uma sequência de nucleotídeos ou uma sequência no formato FASTA"
 
     st.image(imagem, use_column_width=True)
@@ -235,10 +235,10 @@ def main():
     </p>""", unsafe_allow_html=True)
 
     st.subheader("**Insira abaixo as suas sequências de DNA:**")       
-    seq1 = st.text_area(label="Insira aqui a Sequência 1", 
+    seq1 = st.text_area(label=">>> Sequência 1:", 
                         value=default_input1, height=200, help=help_text)
 
-    seq2 = st.text_area(label="Insira aqui a Sequência 2", 
+    seq2 = st.text_area(label=">>> Sequência 2:", 
                         value=default_input2, height=200, help=help_text)
 
     if seq1 and seq2:
