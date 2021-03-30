@@ -8,6 +8,7 @@ from PIL import Image
 import urllib.request
 import io
 
+# Padroniza a sequência e verifica se é DNA:
 
 @st.cache
 def formata_sequencia(sequencia): 
@@ -34,6 +35,7 @@ def eh_dna(seq):
     else:
         return False
 
+# Análise da composição de bases da sequência:
 
 def conta_nucleotideo(seq):
     
@@ -134,13 +136,15 @@ def gera_grafico_gc(df):
     return fig
 
 
-def cria_matriz_subs(m=1, p1=-1, p2=-2):
+# Alinhamento com Needleman-Wunsch:
+
+def cria_matriz_subs():
 
      matriz = {"col": ["A", "C", "G", "T"],
-                 "A": [m, p2, p1, p2],
-                 "C": [p2, m, p2, p1],
-                 "G": [p1, p2, m, p2],
-                 "T": [p2, p1, p2, m]}
+                 "A": [1, -2, -1, -2],
+                 "C": [-2, 1, -2, -1],
+                 "G": [-1, -2, 1, -2],
+                 "T": [-2, -1, -2, 1]}
 
      return matriz
 
@@ -148,6 +152,7 @@ def cria_matriz_subs(m=1, p1=-1, p2=-2):
 def calcula_score(base1, base2, matriz_subs):
 
     j = matriz_subs["col"].index(base1)
+
     for base in "ACGT":
         if base2 == base:
             score = matriz_subs[base2][j]
@@ -155,90 +160,84 @@ def calcula_score(base1, base2, matriz_subs):
 
 
 def valor_maximo(base1, base2, lado, cima, diagonal):
-    # match
+
     if (base1 == base2) and (diagonal >= lado) and (diagonal >= cima):
         return diagonal
-    # mismatch
+
     elif (base1 != base2) and (diagonal >= lado) and (diagonal >= cima):
         return diagonal
-    # indel
+
     elif (lado >= cima) and (lado >= diagonal):
         return lado
-    # indel
+
     else:
         return cima
 
 
 def cria_caminho(base1, base2, lado, cima, diagonal):
-    # match
+
     if (base1 == base2) and (diagonal >= lado) and (diagonal >= cima):
         return "\\"
-    # mismatch
+
     elif (base1 != base2) and (diagonal >= lado) and (diagonal >= cima):
         return "\\"
-    # indel
-    elif (lado >= cima) and (lado >= diagonal):
+
+    elif (lado > cima) and (lado > diagonal):
         return "-"
-    # indel
+
     else:
         return "|"
 
 
-def lcs(seq1, seq2, matriz_subs, g=-3):
+def lcs(seq1, seq2, matriz_subs):
 
     pontuacao = []
     caminho = []
 
-    # preencher a matriz
     for i in range(0, len(seq1)):
         pontuacao.append([0] * len(seq2))
         caminho.append([""] * len(seq2))
 
-    # preencher a primeira linha com "-" e a primeira coluna com "|"
     for i in range(0, len(seq1)):
         caminho[i][0] = "|"
     for j in range(0, len(seq2)):
         caminho[0][j] = "-"
 
-    # linha
+ 
     for i in range(1, len(seq1)):
-        # coluna
-        for j in range(1, len(seq2)):    
+        for j in range(1, len(seq2)):  
 
             base1 = seq1[i]
             base2 = seq2[j] 
-
+            g = -3
             s = calcula_score(base1, base2, matriz_subs)
         
             lado = pontuacao[i][j-1]
             cima = pontuacao[i-1][j]
             diagonal = pontuacao[i-1][j-1]
-
-            # devolver a valor maximo do L        
+    
             pontuacao[i][j] = valor_maximo(base1, base2, lado + g, cima + g, diagonal + s)
             caminho[i][j] = cria_caminho(base1, base2, lado + g, cima + g, diagonal + s)
 
-    return pontuacao, caminho
+    return caminho
 
 
-def gera_alinhamento(seq1, seq2, ponteiros, matriz_subs, g=-3):
+def gera_alinhamento(seq1, seq2, matriz_caminho, matriz_subs):
     ali_seq1 = ""
     ali_seq2 = ""
+    g = -3
     match = 0
     mismatch = 0
-    indel = 0
+    gap = 0
     score_final = 0
 
-    # linhas
     i = len(seq1)-1
-    # colunas
     j = len(seq2)-1
 
     while (i != 0) or (j != 0):
-
         s = calcula_score(seq1[i], seq2[j], matriz_subs)
 
-        if ponteiros[i][j] == "\\" and seq1[i] == seq2[j]:
+        if matriz_caminho[i][j] == "\\" and seq1[i] == seq2[j]:
             ali_seq1 = seq1[i] + ali_seq1
             ali_seq2 = seq2[j] + ali_seq2
             match += 1
@@ -246,7 +245,7 @@ def gera_alinhamento(seq1, seq2, ponteiros, matriz_subs, g=-3):
             i -= 1
             j -= 1
 
-        elif ponteiros[i][j] == "\\" and seq1[i] != seq2[j]:
+        elif matriz_caminho[i][j] == "\\" and seq1[i] != seq2[j]:
             ali_seq1 = seq1[i] + ali_seq1
             ali_seq2 = seq2[j] + ali_seq2
             mismatch += 1
@@ -254,22 +253,24 @@ def gera_alinhamento(seq1, seq2, ponteiros, matriz_subs, g=-3):
             i -= 1
             j -= 1    
     
-        elif ponteiros[i][j] == "-":
+        elif matriz_caminho[i][j] == "-":
             ali_seq1 = " - " + ali_seq1
             ali_seq2 = seq2[j] + ali_seq2
-            indel += 1
+            gap += 1
             score_final += g
             j -= 1
     
-        elif ponteiros[i][j] == "|":
+        elif matriz_caminho[i][j] == "|":
             ali_seq1 = seq1[i] + ali_seq1
             ali_seq2 = " - " + ali_seq2
-            indel += 1
+            gap += 1
             score_final += g
             i -= 1
 
-    return match, mismatch, indel, score_final, ali_seq1, ali_seq2
+    return match, mismatch, gap, score_final, ali_seq1, ali_seq2
 
+
+# função principal:
 
 def main():
 
@@ -278,69 +279,76 @@ def main():
 	    byteImg = io.BytesIO(i.read())
 	    imagem = Image.open(byteImg)
 
-    default_input1 = """ATAGAGTCGG"""
-    default_input2 = """ATTGATCGA"""
+    default_input1 = """AGTTCGCACGTTTAAAA"""
+    default_input2 = """AGCTTCGTACTGTAGAA"""
     help_text = "Insira uma sequência de nucleotídeos ou uma sequência no formato FASTA"
 
     st.image(imagem, use_column_width=True)
-    st.title("Alinhamento global de sequências de DNA")
-    st.markdown("""<p style='text-align: justify'>
-    WebApp que faz o alinhamento global de sequências de DNA, par a par, usando o algoritmo de 
-    <b>Needleman-Wunsch</b>, um dos algoritmos mais utilizados para alinhamento de sequências biológicas. 
-    Foi considerado apenas <b>match</b> entre as bases das sequências, com pontuação +1, enquanto 
-    <b>indel</b> foi pontuação zero. Mismatch não foi considerado. 
-    Esse WebApp também analisa a quantidade e a porcentagem de <b>A C G T</b> e o <b>Conteúdo GC</b> 
-    de cada sequência.
+    st.title("🧬 Alinhamento global de sequências de DNA")
+
+    st.sidebar.markdown("""<p style='text-align: justify'>
+    <b>📌 Sobre</b><br>
+    Web App que faz o alinhamento global entre duas sequências de DNA.<br><br> 
+    <b>⚙️ Como funciona</b><br>
+    Alinhamento baseado no algoritmo de Needleman-Wunsch, o qual busca pelo alinhamento com a maior
+    pontuação final.<br><br> 
+    <b>🔢 Pontuação utilizada</b><br> 
+    <i>> Match:</i> +1, bases iguais alinhadas.<br>
+    <i>> Mismatch:</i> -1, alinhamento entre purina-purina ou pirimidina-pirimidina.<br> 
+    <i>> Mismatch:</i> -2, alinhamento entre purina-pirimidina ou pirimidina-purina.<br> 
+    <i>> Gap:</i> -3, deleção ou inserção de base.<br><br>
+    <b>📊 Composição das sequências</b><br>
+    Esse Web App também analisa a quantidade e a porcentagem de Adenina, Citosina, Guanina e 
+    Timina e o Conteúdo GC de cada sequência.
     </p>""", unsafe_allow_html=True)
 
     st.subheader("**Insira abaixo as suas sequências de DNA:**")       
-    seq1 = st.text_area(label=">>> Sequência 1:", 
-                        value=default_input1, height=200, help=help_text)
+    input_seq1 = st.text_area(label=">>> Sequência 1:", 
+                        value=default_input1, height=100, help=help_text)
+    input_seq2 = st.text_area(label=">>> Sequência 2:", 
+                        value=default_input2, height=100, help=help_text)
 
-    seq2 = st.text_area(label=">>> Sequência 2:", 
-                        value=default_input2, height=200, help=help_text)
-
-    if seq1 and seq2:
-        matriz_subs = cria_matriz_subs(m=1, p1=-1, p2=-2)
-        seq1_formatada = formata_sequencia(seq1)
-        seq2_formatada = formata_sequencia(seq2)
+    if input_seq1 and input_seq2:
+        matriz_subs = cria_matriz_subs()
+        seq1 = formata_sequencia(input_seq1)
+        seq2 = formata_sequencia(input_seq2)
         
-        if eh_dna(seq1_formatada) and eh_dna(seq2_formatada) :
+        if eh_dna(seq1) and eh_dna(seq2):
 
-            matriz_pontuacao, matriz_caminho = lcs(seq1_formatada, seq2_formatada, matriz_subs, g=-3)
-            match, mismatch, indel, score_final, ali_seq1, ali_seq2 = gera_alinhamento(seq1_formatada, seq2_formatada, matriz_caminho, matriz_subs, g=-3)
+            matriz_caminho = lcs(seq1, seq2, matriz_subs)
+            match, mismatch, gap, score_final, ali_seq1, ali_seq2 = gera_alinhamento(seq1, seq2, matriz_caminho, matriz_subs)
             
-            df_quantidade = df_quantidade_nucleotideos(seq1_formatada, seq2_formatada)
-            df_porcentagem = df_porcentagem_nucleotideos(seq1_formatada, seq2_formatada)
+            df_quantidade = df_quantidade_nucleotideos(seq1, seq2)
+            df_porcentagem = df_porcentagem_nucleotideos(seq1, seq2)
+            df_gc = conteudo_gc(seq1, seq2)
 
             grafico_quantidade = gera_grafico(df_quantidade, "Quantidade") 
             grafico_porcentagem = gera_grafico(df_porcentagem, "Porcentagem") 
-            
-            df_gc = conteudo_gc(seq1_formatada, seq2_formatada)
             grafico_gc = gera_grafico_gc(df_gc)
             
             st.subheader("**# 1. Alinhamento global:**")
-            st.write("Total de matches:", match)
-            st.write("Total de mismatches:", mismatch)
-            st.write("Total de indels:", indel)
-            st.write("Score final:", score_final)
-            st.write("(1)", ali_seq1)
-            st.write("(2)", ali_seq2)
-         
-            st.subheader("**# 2. Análise das bases:**")
-            selecao = st.selectbox("Selecione o gráfico:", ["Quantidade", "Porcentagem"])
-     
+            st.markdown(f"(1) {ali_seq1}<br>(2) {ali_seq2}", unsafe_allow_html=True)
+            st.markdown(f"""<p><i>Matches: {match}<br>Mismatches: {mismatch}<br>Gaps: {gap}</i><br>
+                        <b>Pontuação final = {score_final}""", unsafe_allow_html=True)   
+                             
+            st.subheader("**# 2. Análise das bases:**")            
+            selecao = st.selectbox("Selecione o tipo de análise:", ["Quantidade", "Porcentagem"])
+            resposta = st.radio("Mostrar gráficos?", ["Sim", "Não"], index=1) 
+
             if selecao == "Quantidade":
                 st.dataframe(df_quantidade)
-                st.pyplot(grafico_quantidade)
+                if resposta == "Sim":
+                    st.pyplot(grafico_quantidade)
 
             elif selecao =="Porcentagem":
                 st.dataframe(df_porcentagem)
-                st.pyplot(grafico_porcentagem)
-                  
+                if resposta == "Sim":
+                    st.pyplot(grafico_porcentagem)
+                    
             st.subheader("**# 3. Conteúdo GC:**")
             st.dataframe(df_gc)
-            st.pyplot(grafico_gc)
+            if resposta == "Sim":
+                st.pyplot(grafico_gc)
 
         else:
             st.write("*As sequências inseridas não são DNA =(*")
@@ -349,4 +357,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
