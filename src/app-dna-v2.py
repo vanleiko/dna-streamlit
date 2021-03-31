@@ -10,7 +10,7 @@ import io
 
 # Padroniza a sequência e verifica se é DNA:
 
-@st.cache
+
 def formata_sequencia(sequencia): 
     sequencia = sequencia.upper()
         
@@ -28,12 +28,13 @@ def formata_sequencia(sequencia):
     return sequencia
 
 
-@st.cache
+
 def eh_dna(seq):
     if set(seq).issubset({"A", "C", "G", "T", "*"}):
         return True
     else:
         return False
+
 
 # Análise da composição de bases da sequência:
 
@@ -163,13 +164,10 @@ def valor_maximo(base1, base2, lado, cima, diagonal):
 
     if (base1 == base2) and (diagonal >= lado) and (diagonal >= cima):
         return diagonal
-
     elif (base1 != base2) and (diagonal >= lado) and (diagonal >= cima):
         return diagonal
-
-    elif (lado >= cima) and (lado >= diagonal):
+    elif (lado > cima) and (lado > diagonal):
         return lado
-
     else:
         return cima
 
@@ -178,13 +176,10 @@ def cria_caminho(base1, base2, lado, cima, diagonal):
 
     if (base1 == base2) and (diagonal >= lado) and (diagonal >= cima):
         return "\\"
-
     elif (base1 != base2) and (diagonal >= lado) and (diagonal >= cima):
         return "\\"
-
     elif (lado > cima) and (lado > diagonal):
         return "-"
-
     else:
         return "|"
 
@@ -193,23 +188,24 @@ def lcs(seq1, seq2, matriz_subs):
 
     pontuacao = []
     caminho = []
+    g = -3
 
     for i in range(0, len(seq1)):
         pontuacao.append([0] * len(seq2))
         caminho.append([""] * len(seq2))
 
     for i in range(0, len(seq1)):
+        pontuacao[i][0] = g * i
         caminho[i][0] = "|"
     for j in range(0, len(seq2)):
+        pontuacao[0][j] = g * j
         caminho[0][j] = "-"
-
  
     for i in range(1, len(seq1)):
         for j in range(1, len(seq2)):  
 
             base1 = seq1[i]
             base2 = seq2[j] 
-            g = -3
             s = calcula_score(base1, base2, matriz_subs)
         
             lado = pontuacao[i][j-1]
@@ -279,27 +275,33 @@ def main():
 	    byteImg = io.BytesIO(i.read())
 	    imagem = Image.open(byteImg)
 
-    default_input1 = """AGTTCGCACGTTTAAAA"""
-    default_input2 = """AGCTTCGTACTGTAGAA"""
+    default_input1 = """AGTTCGCACGGTTA"""
+    default_input2 = """AGATTCGTACTGTA"""
     help_text = "Insira uma sequência de nucleotídeos ou uma sequência no formato FASTA"
 
     st.image(imagem, use_column_width=True)
-    st.title("🧬 Alinhamento global de sequências de DNA")
+    st.title("Alinhamento global de sequências de DNA")
 
     st.sidebar.markdown("""<p style='text-align: justify'>
-    <b>📌 Sobre</b><br>
+    <b>🧬 Sobre</b><br>
     Web App que faz o alinhamento global entre duas sequências de DNA.<br><br> 
     <b>⚙️ Como funciona</b><br>
-    Alinhamento baseado no algoritmo de Needleman-Wunsch, o qual busca pelo alinhamento com a maior
-    pontuação final.<br><br> 
+    Alinhamento baseado no algoritmo de Needleman-Wunsch (1970), o qual busca pelo alinhamento ótimo 
+    entre duas sequências, ou seja, aquele com a maior pontuação final.<br><br> 
     <b>🔢 Pontuação utilizada</b><br> 
     <i>> Match:</i> +1, bases iguais alinhadas.<br>
     <i>> Mismatch:</i> -1, alinhamento entre purina-purina ou pirimidina-pirimidina.<br> 
     <i>> Mismatch:</i> -2, alinhamento entre purina-pirimidina ou pirimidina-purina.<br> 
-    <i>> Gap:</i> -3, deleção ou inserção de base.<br><br>
+    <i>> Gap:</i> -3, deleção ou inserção de base.<br>
+    A matriz de substituição para scoring de match e mismatch foi baseada no modelo K2P (Kimura, 1980).<br><br>
     <b>📊 Composição das sequências</b><br>
     Esse Web App também analisa a quantidade e a porcentagem de Adenina, Citosina, Guanina e 
-    Timina e o Conteúdo GC de cada sequência.
+    Timina e o Conteúdo GC de cada sequência.</b><br><br> 
+    <b>📚 Referências</b><br>
+    Needleman, S.B. e Wunsch, C.D. 1970. A general method applicable to the search for similarities in 
+    the amino acid sequences of two proteins. J. Mol. Bio., 48:443-453.<br>
+    Kimura, M. 1980. A simple method for estimating evolutionary rates of base substitutions through comparative
+    studies of nucleotide sequences. J. Mol. Evol., 16:111-120.
     </p>""", unsafe_allow_html=True)
 
     st.subheader("**Insira abaixo as suas sequências de DNA:**")       
@@ -352,8 +354,8 @@ def main():
 
         else:
             st.write("*As sequências inseridas não são DNA =(*")
-            st.write("*Insira novamente suas sequências*")        
+            st.write("*Insira novamente suas sequências*")  
 
-
+        
 if __name__ == "__main__":
     main()
