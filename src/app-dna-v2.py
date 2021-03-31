@@ -289,11 +289,11 @@ def main():
     Alinhamento baseado no algoritmo de Needleman-Wunsch (1970), o qual busca pelo alinhamento ótimo 
     entre duas sequências, ou seja, aquele com a maior pontuação final.<br><br> 
     <b>🔢 Pontuação utilizada</b><br> 
+    A matriz de substituição para scoring de match e mismatch foi baseada no modelo K2P (Kimura, 1980).<br>
     <i>> Match:</i> +1, bases iguais alinhadas.<br>
-    <i>> Mismatch:</i> -1, alinhamento entre purina-purina ou pirimidina-pirimidina.<br> 
-    <i>> Mismatch:</i> -2, alinhamento entre purina-pirimidina ou pirimidina-purina.<br> 
-    <i>> Gap:</i> -3, deleção ou inserção de base.<br>
-    A matriz de substituição para scoring de match e mismatch foi baseada no modelo K2P (Kimura, 1980).<br><br>
+    <i>> Mismatch:</i> -1, alinhamento entre purina-purina ou pirimidina-pirimidina (transição).<br> 
+    <i>> Mismatch:</i> -2, alinhamento entre purina-pirimidina (transversão).<br> 
+    <i>> Gap:</i> -3, deleção ou inserção de base.<br><br>
     <b>📊 Composição das sequências</b><br>
     Esse Web App também analisa a quantidade e a porcentagem de Adenina, Citosina, Guanina e 
     Timina e o Conteúdo GC de cada sequência.</b><br><br> 
