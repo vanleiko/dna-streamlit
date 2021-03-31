@@ -61,55 +61,55 @@ def conta_nucleotideo(seq):
 
 def df_quantidade_nucleotideos(seq1, seq2):   
 
-    df = pd.DataFrame(columns=["Feature", "Sequência 1", "Sequência 2"])
+    df = pd.DataFrame(columns=["Feature", "String 1", "String 2"])
   
     quantidade1, _ = conta_nucleotideo(seq1)
     quantidade2, _ = conta_nucleotideo(seq2)
 
-    df["Feature"] = ["Adenina", "Citosina", "Guanina", "Timina", "Total"]
-    df["Sequência 1"] = quantidade1
-    df["Sequência 2"] = quantidade2
+    df["Feature"] = ["Adenin", "Cytosin", "Guanin", "Thymin", "Total"]
+    df["String 1"] = quantidade1
+    df["String 2"] = quantidade2
 
     return df
 
 
 def df_porcentagem_nucleotideos(seq1, seq2):   
 
-    df = pd.DataFrame(columns=["Feature", "Sequência 1", "Sequência 2"])
+    df = pd.DataFrame(columns=["Feature", "String 1", "String 2"])
   
     _, porcentagem1 = conta_nucleotideo(seq1)
     _, porcentagem2 = conta_nucleotideo(seq2)
 
-    df["Feature"] = ["Adenina", "Citosina", "Guanina", "Timina", "Total"]
-    df["Sequência 1"] = porcentagem1
-    df["Sequência 2"] = porcentagem2
+    df["Feature"] = ["Adenin", "Cytosin", "Guanin", "Thymin", "Total"]
+    df["String 1"] = porcentagem1
+    df["String 2"] = porcentagem2
 
     return df
 
 
-def gera_grafico(df, selecao="Quantidade"):
+def gera_grafico(df, selecao="Quantity"):
 
-    df_melt = pd.melt(df[:4], id_vars="Feature", var_name="Sequência", value_name=selecao)
+    df_melt = pd.melt(df[:4], id_vars="Feature", var_name="String", value_name=selecao)
 
     fig, ax = plt.subplots(figsize=(6,3))
-    ax = sns.barplot(x='Feature', y=selecao, hue='Sequência', data=df_melt)
-    ax.set_title(f"{selecao} das bases", fontweight="bold", fontsize=14)
-    ax.set_xlabel("Base", fontsize=12)
+    ax = sns.barplot(x='Feature', y=selecao, hue='String', data=df_melt)
+    ax.set_title(f"Nucleotides {selecao}", fontweight="bold", fontsize=14)
+    ax.set_xlabel("Nucleotide", fontsize=12)
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     plt.legend(bbox_to_anchor=(1.35, 1))
   
-    if selecao == "Porcentagem":
+    if selecao == "Percentage":
         ax.set_ylim(0, 100)
-        ax.set_ylabel("Porcentagem (%)", fontsize=12)    
+        ax.set_ylabel("Percentage (%)", fontsize=12)    
     else:
-        ax.set_ylabel("Quantidade", fontsize=12) 
+        ax.set_ylabel("Quantity", fontsize=12) 
 
     return fig
 
 
 def conteudo_gc(seq1, seq2):
        
-    df = pd.DataFrame(columns=["Feature", "Sequência", "Porcentagem"])
+    df = pd.DataFrame(columns=["Feature", "String", "Percentage"])
 
     _, porcentagem1 = conta_nucleotideo(seq1)
     _, porcentagem2 = conta_nucleotideo(seq2)
@@ -118,8 +118,8 @@ def conteudo_gc(seq1, seq2):
     gc2 = porcentagem2[2] + porcentagem2[1]
 
     df["Feature"] = ["GC", "GC"]
-    df["Sequência"] = ["Sequência 1", "Sequência 2"]
-    df["Porcentagem"] = [gc1, gc2]
+    df["String"] = ["String 1", "String 2"]
+    df["Percentage"] = [gc1, gc2]
   
     return df
 
@@ -127,9 +127,9 @@ def conteudo_gc(seq1, seq2):
 def gera_grafico_gc(df):
  
     fig, ax = plt.subplots(figsize=(6,3))
-    ax = sns.barplot(x="Feature", y="Porcentagem", hue="Sequência", data=df)
-    ax.set_title(f"Conteúdo GC", fontweight="bold", fontsize=14)
-    ax.set_ylabel("Porcentagem (%)", fontsize=12)
+    ax = sns.barplot(x="Feature", y="Percentage", hue="String", data=df)
+    ax.set_title(f"GC Content", fontweight="bold", fontsize=14)
+    ax.set_ylabel("Percentage (%)", fontsize=12)
     ax.set_ylim(0, 100)
     ax.set_xlabel(None)
     plt.legend(bbox_to_anchor=(1.35, 1))
@@ -275,39 +275,40 @@ def main():
 	    byteImg = io.BytesIO(i.read())
 	    imagem = Image.open(byteImg)
 
-    default_input1 = """AGTTCGCACGGTTA"""
-    default_input2 = """AGATTCGTACTGTA"""
-    help_text = "Insira uma sequência de nucleotídeos ou uma sequência no formato FASTA"
+    default_input1 = "AGTTCGCACGGTTA"
+    default_input2 = "AGATTCGTACTGTA"
+    help_text = "Free nucleotides sequence or FASTA format"
 
     st.image(imagem, use_column_width=True)
-    st.title("Alinhamento global de sequências de DNA")
+    st.title("Global DNA sequences alignment")
 
     st.sidebar.markdown("""<p style='text-align: justify'>
-    <b>🧬 Sobre</b><br>
-    Web App que faz o alinhamento global entre duas sequências de DNA.<br><br> 
-    <b>⚙️ Como funciona</b><br>
-    Alinhamento baseado no algoritmo de Needleman-Wunsch (1970), o qual busca pelo alinhamento ótimo 
-    entre duas sequências, ou seja, aquele com a maior pontuação final.<br><br> 
-    <b>🔢 Pontuação utilizada</b><br> 
-    A matriz de substituição para scoring de match e mismatch foi baseada no modelo K2P (Kimura, 1980).<br>
-    <i>> Match:</i> +1, bases iguais alinhadas.<br>
-    <i>> Mismatch:</i> -1, alinhamento entre purina-purina ou pirimidina-pirimidina (transição).<br> 
-    <i>> Mismatch:</i> -2, alinhamento entre purina-pirimidina (transversão).<br> 
-    <i>> Gap:</i> -3, deleção ou inserção de base.<br><br>
-    <b>📊 Composição das sequências</b><br>
-    Esse Web App também analisa a quantidade e a porcentagem de Adenina, Citosina, Guanina e 
-    Timina e o Conteúdo GC de cada sequência.</b><br><br> 
-    <b>📚 Referências</b><br>
-    Needleman, S.B. e Wunsch, C.D. 1970. A general method applicable to the search for similarities in 
+    <b>🧬 About this web app</b><br>
+    Global alignment between two DNA strings (pairwise alignment).<br><br> 
+    <b>⚙️ How it works</b><br>
+    Global sequence alignment based on Needleman-Wunsch algorithm, which searches for the 
+    optimal alignment (highest score) between two sequences.<br><br> 
+    <b>🔢 Scoring</b><br> 
+    The score for match and mismatch was based on nucleotide substitution model K2P (Kimura 2-parameters),
+    which allows for different rates of transition and transversion.<br>
+    <i>> Match = +1</i>, for similarity<br>
+    <i>> Mismatch = -1</i>, for transition<br> 
+    <i>> Mismatch = -2</i>, for transversion<br> 
+    <i>> Gap = -3</i>, for insertion or deletion<br><br>
+    <b>📊 Nucleotides content</b><br>
+    This web app also counts the amount and percentage of Adenin, Cytosin, Guanin and  
+    Thymin and GC-Content from each sequence.</b><br><br> 
+    <b>📚 References</b><br>
+    Needleman, S.B. and Wunsch, C.D. 1970. A general method applicable to the search for similarities in 
     the amino acid sequences of two proteins. J. Mol. Bio., 48:443-453.<br>
     Kimura, M. 1980. A simple method for estimating evolutionary rates of base substitutions through comparative
     studies of nucleotide sequences. J. Mol. Evol., 16:111-120.
     </p>""", unsafe_allow_html=True)
 
-    st.subheader("**Insira abaixo as suas sequências de DNA:**")       
-    input_seq1 = st.text_area(label=">>> Sequência 1:", 
+    st.subheader("**Enter below your DNA sequences:**")       
+    input_seq1 = st.text_area(label=">>> String 1:", 
                         value=default_input1, height=100, help=help_text)
-    input_seq2 = st.text_area(label=">>> Sequência 2:", 
+    input_seq2 = st.text_area(label=">>> String 2:", 
                         value=default_input2, height=100, help=help_text)
 
     if input_seq1 and input_seq2:
@@ -324,37 +325,37 @@ def main():
             df_porcentagem = df_porcentagem_nucleotideos(seq1, seq2)
             df_gc = conteudo_gc(seq1, seq2)
 
-            grafico_quantidade = gera_grafico(df_quantidade, "Quantidade") 
-            grafico_porcentagem = gera_grafico(df_porcentagem, "Porcentagem") 
+            grafico_quantidade = gera_grafico(df_quantidade, "Quantity") 
+            grafico_porcentagem = gera_grafico(df_porcentagem, "Percentage") 
             grafico_gc = gera_grafico_gc(df_gc)
             
-            st.subheader("**# 1. Alinhamento global:**")
+            st.subheader("**# 1. Global alignment:**")
             st.markdown(f"(1) {ali_seq1}<br>(2) {ali_seq2}", unsafe_allow_html=True)
             st.markdown(f"""<p><i>Matches: {match}<br>Mismatches: {mismatch}<br>Gaps: {gap}</i><br>
-                        <b>Pontuação final = {score_final}""", unsafe_allow_html=True)   
+                        <i><b>Final score: {score_final}""", unsafe_allow_html=True)   
                              
-            st.subheader("**# 2. Análise das bases:**")            
-            selecao = st.selectbox("Selecione o tipo de análise:", ["Quantidade", "Porcentagem"])
-            resposta = st.radio("Mostrar gráficos?", ["Sim", "Não"], index=1) 
+            st.subheader("**# 2. Nucleotides:**")            
+            selecao = st.selectbox("Select:", ["Quantity", "Percentage"])
+            resposta = st.radio("Charts?", ["Yes", "No"], index=1) 
 
-            if selecao == "Quantidade":
+            if selecao == "Quantity":
                 st.dataframe(df_quantidade)
-                if resposta == "Sim":
+                if resposta == "Yes":
                     st.pyplot(grafico_quantidade)
 
-            elif selecao =="Porcentagem":
+            elif selecao =="Percentage":
                 st.dataframe(df_porcentagem)
-                if resposta == "Sim":
+                if resposta == "Yes":
                     st.pyplot(grafico_porcentagem)
                     
-            st.subheader("**# 3. Conteúdo GC:**")
+            st.subheader("**# 3. GC Content:**")
             st.dataframe(df_gc)
-            if resposta == "Sim":
+            if resposta == "Yes":
                 st.pyplot(grafico_gc)
 
         else:
-            st.write("*As sequências inseridas não são DNA =(*")
-            st.write("*Insira novamente suas sequências*")  
+            st.write("*Your entered sequences are not DNA sequences =(*")
+            st.write("*Please, try again*")  
 
         
 if __name__ == "__main__":
