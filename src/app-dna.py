@@ -181,6 +181,8 @@ def lcs(seq1, seq2):
 def gera_alinhamento(seq1, seq2, pontuacao, caminho):
     ali_seq1 = ""
     ali_seq2 = ""
+    match = 0
+    gap = 0
 
     # linhas
     i = len(seq1)-1
@@ -188,25 +190,27 @@ def gera_alinhamento(seq1, seq2, pontuacao, caminho):
     j = len(seq2)-1
 
     while (i != 0) or (j != 0):
+
         if caminho[i][j] == "\\":
             ali_seq1 = seq1[i] + ali_seq1
             ali_seq2 = seq2[j] + ali_seq2
+            match += 1
             i -= 1
             j -= 1
     
         elif caminho[i][j] == "-":
             ali_seq1 = " - " + ali_seq1
             ali_seq2 = seq2[j] + ali_seq2
+            gap += 1
             j -= 1
         
         else:
             ali_seq1 = seq1[i] + ali_seq1
             ali_seq2 = " - " + ali_seq2
+            gap += 1
             i -= 1
 
-    matches = pontuacao[-1][-1]
-
-    return matches, ali_seq1, ali_seq2  
+    return match, gap, ali_seq1, ali_seq2  
 
 
 def main():
@@ -216,8 +220,8 @@ def main():
 	    byteImg = io.BytesIO(i.read())
 	    imagem = Image.open(byteImg)
 
-    default_input1 = """ATGGCAACGGGATCGTAAAGCAAGATTCCGACTATCGTAGCTAGCTTGGAAAA"""
-    default_input2 = """TCAATCGATCGTAAAGCAGATTCCGACTAAAGTAGCTAGCTTGTAAAT"""
+    default_input1 = "AGTTCGCACGGTTA"
+    default_input2 = "AGATTCGTACTGTA"
     help_text = "Insira uma sequência de nucleotídeos ou uma sequência no formato FASTA"
 
     st.image(imagem, use_column_width=True)
@@ -230,7 +234,7 @@ def main():
     <b>gap</b> foi pontuação zero. Mismatch não foi considerado.<br> 
     Esse Web App também analisa a quantidade e a porcentagem de <b>A C G T</b> e o <b>Conteúdo GC</b> 
     de cada sequência.<br></p>""", unsafe_allow_html=True)
-    st.write("Obs: realizei algumas melhorias neste web app, o qual pode ser acessado [neste link.](https://share.streamlit.io/vanleiko/dna-streamlit/main/src/app-dna-v2.py)")
+    st.write("Obs: realizei algumas melhorias neste web app, o qual pode ser acessado por [este link.](https://share.streamlit.io/vanleiko/dna-streamlit/main/src/app-dna-v2.py)")
     
     
     
@@ -250,7 +254,7 @@ def main():
         if eh_dna(seq1_formatada) and eh_dna(seq2_formatada) :
 
             matriz_pontuacao, matriz_caminho = lcs(seq1_formatada, seq2_formatada)
-            matches, ali_seq1, ali_seq2 = gera_alinhamento(seq1_formatada, seq2_formatada, matriz_pontuacao, matriz_caminho)
+            match, gap, ali_seq1, ali_seq2 = gera_alinhamento(seq1_formatada, seq2_formatada, matriz_pontuacao, matriz_caminho)
             
             df_quantidade = df_quantidade_nucleotideos(seq1_formatada, seq2_formatada)
             df_porcentagem = df_porcentagem_nucleotideos(seq1_formatada, seq2_formatada)
@@ -262,9 +266,8 @@ def main():
             grafico_gc = gera_grafico_gc(df_gc)
             
             st.subheader("**# 1. Alinhamento global:**")
-            st.write("Total de matches:", matches)
-            st.write("(1)", ali_seq1)
-            st.write("(2)", ali_seq2)
+            st.markdown(f"Matches: {match} <br>Gaps: {gap}", unsafe_allow_html=True)
+            st.markdown(f"(1) {ali_seq1} <br> (2) {ali_seq2}", unsafe_allow_html=True)
          
             st.subheader("**# 2. Análise das bases:**")
             selecao = st.selectbox("Selecione o gráfico:", ["Quantidade", "Porcentagem"])
