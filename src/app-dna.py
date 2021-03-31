@@ -225,12 +225,15 @@ def main():
 
     st.markdown("""<p style='text-align: justify'>
     Web App que faz o alinhamento global de sequências de DNA, par a par, usando o algoritmo de 
-    <b>Needleman-Wunsch</b>, um dos algoritmos mais utilizados para alinhamento de sequências biológicas. 
+    <b>Needleman-Wunsch</b>, um dos algoritmos mais utilizados para alinhamento de sequências biológicas.<br> 
     Foi considerado apenas <b>match</b> entre as bases das sequências, com pontuação +1, enquanto 
-    <b>gap</b> foi pontuação zero. Mismatch não foi considerado. 
+    <b>gap</b> foi pontuação zero. Mismatch não foi considerado.<br> 
     Esse Web App também analisa a quantidade e a porcentagem de <b>A C G T</b> e o <b>Conteúdo GC</b> 
-    de cada sequência.
-    </p>""", unsafe_allow_html=True)
+    de cada sequência.<br></p>""", unsafe_allow_html=True)
+    st.write("Obs: realizei algumas melhorias neste web app, o qual pode ser acessado [neste link.](https://share.streamlit.io/vanleiko/dna-streamlit/main/src/app-dna-v2.py)")
+    
+    
+    
 
     st.subheader("**Insira abaixo as suas sequências de DNA:**")       
     seq1 = st.text_area(label=">>> Sequência 1:", 
