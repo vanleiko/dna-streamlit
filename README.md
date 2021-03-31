@@ -1,7 +1,19 @@
 # dna-streamlit
 
-WebApp que faz o alinhamento global par a par de sequências de DNA e analisa a quantidade e a porcentagem de bases e o conteúdo GC das sequências.
+Web App que faz o alinhamento global par a par de sequências de DNA e analisa a quantidade e a porcentagem de bases e o conteúdo GC das sequências.
 
-Para o alinhamento, foi utilizado o algoritmo de Needleman-Wunsch, considerando apenas match entre as sequências. Cada match foi pontuado +1 na construção da matriz; indels foram considerados como zero.
+Para o alinhamento, foi utilizado o algoritmo de Needleman-Wunsch, que faz alinhamento ótimo entre 2 sequências.
 
-Para acessar o WebApp, [clique aqui](https://share.streamlit.io/vanleiko/dna-streamlit/main/src/app-dna.py)
+Para acessar o Web App versão 1, [clique aqui](https://share.streamlit.io/vanleiko/dna-streamlit/main/src/app-dna.py)
+
+Na versão 1 do webapp, foi considerado apenas match (+1) e gap (0) para o cálculo da pontuação para o alinhamento entre as sequências.
+
+Na versão 2, foi utilizada uma matriz de scoring para match e mismatch, segundo Kimura, 1980. Sendo que:
+
+Match = +1
+
+Mismatch do tipo transição = -1
+
+Mismatch do tipo transversão = -2
+
+Para gap, a penalidade foi de -3.
