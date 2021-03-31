@@ -135,24 +135,19 @@ def gera_grafico_gc(df):
 
 
 def valor_maximo(c1, c2, lado, cima, diagonal):
-    if (c1 == c2) and ((diagonal+1) >= lado) and ((diagonal+1) >= cima):
-        diagonal += 1
-        return diagonal
-  
-    elif (lado >= cima) and (lado >= diagonal):
-        return lado
-  
+    if (c1 == c2) and (diagonal+1 >= lado) and (diagonal+1 >= cima):
+        return diagonal+1  
+    elif (lado >= cima) and (lado >= diagonal+1):
+        return lado  
     else:
         return cima
 
 
 def acha_caminho(c1, c2, lado, cima, diagonal):
-    if (c1 == c2) and ((diagonal+1) >= lado) and ((diagonal+1) >= cima):
-        return "\\"
-  
-    elif (lado >= cima) and (lado >= diagonal):
+    if (c1 == c2) and (diagonal+1 >= lado) and (diagonal+1 >= cima):
+        return "\\"  
+    elif (lado >= cima) and (lado >= diagonal+1):
         return "-"
-  
     else:
         return "|"
 
@@ -227,21 +222,22 @@ def main():
 
     st.image(imagem, use_column_width=True)
     st.title("Alinhamento global de sequências de DNA")
+
     st.markdown("""<p style='text-align: justify'>
-    WebApp que faz o alinhamento global de sequências de DNA, par a par, usando o algoritmo de 
+    Web App que faz o alinhamento global de sequências de DNA, par a par, usando o algoritmo de 
     <b>Needleman-Wunsch</b>, um dos algoritmos mais utilizados para alinhamento de sequências biológicas. 
     Foi considerado apenas <b>match</b> entre as bases das sequências, com pontuação +1, enquanto 
-    <b>indel</b> foi pontuação zero. Mismatch não foi considerado. 
-    Esse WebApp também analisa a quantidade e a porcentagem de <b>A C G T</b> e o <b>Conteúdo GC</b> 
+    <b>gap</b> foi pontuação zero. Mismatch não foi considerado. 
+    Esse Web App também analisa a quantidade e a porcentagem de <b>A C G T</b> e o <b>Conteúdo GC</b> 
     de cada sequência.
     </p>""", unsafe_allow_html=True)
 
     st.subheader("**Insira abaixo as suas sequências de DNA:**")       
     seq1 = st.text_area(label=">>> Sequência 1:", 
-                        value=default_input1, height=200, help=help_text)
+                        value=default_input1, height=150, help=help_text)
 
     seq2 = st.text_area(label=">>> Sequência 2:", 
-                        value=default_input2, height=200, help=help_text)
+                        value=default_input2, height=150, help=help_text)
 
     if seq1 and seq2:
 
