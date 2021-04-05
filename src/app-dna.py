@@ -17,11 +17,11 @@ def formata_sequencia(sequencia):
         sequencia = sequencia.splitlines()
         sequencia = sequencia[1:]
         sequencia = "".join(sequencia).strip()
-        sequencia = "*" + sequencia.strip()
+        sequencia = "*" + sequencia
         
     else:
         sequencia = sequencia.splitlines()
-        sequencia = "".join(sequencia)
+        sequencia = "".join(sequencia).strip()
         sequencia = "*" + sequencia 
         
     return sequencia
