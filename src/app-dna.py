@@ -135,18 +135,18 @@ def gera_grafico_gc(df):
 
 
 def valor_maximo(c1, c2, lado, cima, diagonal):
-    if (c1 == c2) and (diagonal+1 >= lado) and (diagonal+1 >= cima):
+    if (c1 == c2) and (diagonal+1 > lado) and (diagonal+1 > cima):
         return diagonal+1  
-    elif (lado >= cima) and (lado >= diagonal+1):
+    elif (lado > cima) and (lado > diagonal+1):
         return lado  
     else:
         return cima
 
 
 def acha_caminho(c1, c2, lado, cima, diagonal):
-    if (c1 == c2) and (diagonal+1 >= lado) and (diagonal+1 >= cima):
+    if (c1 == c2) and (diagonal+1 > lado) and (diagonal+1 > cima):
         return "\\"  
-    elif (lado >= cima) and (lado >= diagonal+1):
+    elif (lado > cima) and (lado > diagonal+1):
         return "-"
     else:
         return "|"
@@ -220,8 +220,8 @@ def main():
 	    byteImg = io.BytesIO(i.read())
 	    imagem = Image.open(byteImg)
 
-    default_input1 = "AGTTCGCACGGTTA"
-    default_input2 = "AGATTCGTACTGTA"
+    default_input1 = "ACGGGTAA"
+    default_input2 = "ACGTAG"
     help_text = "Insira uma sequência de nucleotídeos ou uma sequência no formato FASTA"
 
     st.image(imagem, use_column_width=True)
