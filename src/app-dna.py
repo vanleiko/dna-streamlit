@@ -16,8 +16,8 @@ def formata_sequencia(sequencia):
     if sequencia[0] == ">":
         sequencia = sequencia.splitlines()
         sequencia = sequencia[1:]
-        sequencia = "".join(sequencia)
-        sequencia = "*" + sequencia
+        sequencia = "".join(sequencia).strip()
+        sequencia = "*" + sequencia.strip()
         
     else:
         sequencia = sequencia.splitlines()
